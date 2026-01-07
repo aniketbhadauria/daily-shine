@@ -10,6 +10,10 @@ import { SubscriptionCard } from "@/components/SubscriptionCard";
 import { Button } from "@/components/ui/button";
 import { Droplets, TrendingUp, Calendar, Settings, ChevronRight, Plus, MapPin } from "lucide-react";
 
+// Photo proof images
+import washAfter1 from "@/assets/wash-after-1.jpg";
+import washBefore1 from "@/assets/wash-before-1.jpg";
+
 const Index = () => {
   const [activeNav, setActiveNav] = useState("today");
   const [activeHomeTab, setActiveHomeTab] = useState("today");
@@ -21,10 +25,28 @@ const Index = () => {
   ];
 
   const todayWashes = [
-    { date: "7", day: "Tue", status: "completed" as const, time: "6:45 AM" },
-    { date: "6", day: "Mon", status: "completed" as const, time: "6:52 AM" },
+    { 
+      date: "7", 
+      day: "Tue", 
+      status: "completed" as const, 
+      time: "6:45 AM",
+      photos: { before: washBefore1, after: washAfter1 }
+    },
+    { 
+      date: "6", 
+      day: "Mon", 
+      status: "completed" as const, 
+      time: "6:52 AM",
+      photos: { before: washBefore1, after: washAfter1 }
+    },
     { date: "5", day: "Sun", status: "skipped" as const, reason: "Rain detected" },
-    { date: "4", day: "Sat", status: "completed" as const, time: "7:10 AM" },
+    { 
+      date: "4", 
+      day: "Sat", 
+      status: "completed" as const, 
+      time: "7:10 AM",
+      photos: { before: washBefore1, after: washAfter1 }
+    },
   ];
 
   const upcomingWashes = [
