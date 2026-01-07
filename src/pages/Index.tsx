@@ -8,7 +8,8 @@ import { CalendarGrid } from "@/components/CalendarGrid";
 import { StatsCard } from "@/components/StatsCard";
 import { SubscriptionCard } from "@/components/SubscriptionCard";
 import { Button } from "@/components/ui/button";
-import { Droplets, TrendingUp, Calendar, Settings, ChevronRight, Plus, MapPin } from "lucide-react";
+import { Droplets, TrendingUp, Calendar, Settings, ChevronRight, Plus, MapPin, Truck } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // Photo proof images
 import washAfter1 from "@/assets/wash-after-1.jpg";
@@ -284,6 +285,21 @@ const Index = () => {
                     </button>
                   ))}
                 </div>
+              </section>
+
+              {/* Demo: Switch to Washer App */}
+              <section>
+                <h2 className="text-lg font-semibold mb-3">Demo Mode</h2>
+                <Link to="/washer">
+                  <button className="w-full flex items-center gap-3 p-4 rounded-xl bg-accent/10 border border-accent/30 hover:bg-accent/20 transition-colors">
+                    <Truck className="h-5 w-5 text-accent" />
+                    <span className="flex-1 text-left font-medium text-accent">Open Washer App</span>
+                    <ChevronRight className="h-5 w-5 text-accent" />
+                  </button>
+                </Link>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  Switch to the washer interface to see their daily route
+                </p>
               </section>
             </div>
           </>
