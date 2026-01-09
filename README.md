@@ -1,73 +1,139 @@
-# Welcome to your Lovable project
+# On-Demand Car Wash Service App – Bhopal
 
-## Project info
+## Overview
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+This project is a full-stack web application designed to provide **on-demand and subscription-based car washing services** for customers in **Bhopal**, India.
 
-## How can I edit this code?
+The platform connects **car owners** with **verified local car washers**, enabling convenient booking, scheduling, and service management through a digital interface. The goal is to replace informal, unreliable car wash arrangements with a **structured, predictable, and scalable service model**, especially suited for residential areas like Kolar Road and nearby localities.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## Problem Statement
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Car owners in Bhopal face recurring issues:
 
-Changes made via Lovable will be committed automatically to this repo.
+* Inconsistent availability of local car washers
+* No fixed schedules or accountability
+* Manual cash payments with no service history
+* Difficulty managing daily or weekly wash routines
 
-**Use your preferred IDE**
+Car washers, on the other hand:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+* Depend on word-of-mouth and physical presence
+* Lack predictable income
+* Have no tools to manage routes, customers, or payments
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+This project solves both sides of the problem.
 
-Follow these steps:
+---
+
+## Solution
+
+The application provides two dedicated interfaces:
+
+### 1. Customer App
+
+For residents and car owners:
+
+* Book one-time or recurring car wash services
+* Choose **daily, weekly, or monthly subscription plans**
+* Manage preferred time slots
+* Track service history
+* Digital payments and invoices
+
+### 2. Washer App
+
+For service providers:
+
+* View assigned jobs and routes
+* Manage daily schedules
+* Track completed services
+* Receive payouts digitally
+* Build service credibility over time
+
+---
+
+## Target Users
+
+* **Primary Customers**:
+  Car owners living in apartments, gated societies, and independent houses in Bhopal
+
+* **Service Providers**:
+  Local car washers seeking consistent work and structured income
+
+---
+
+## Geography Focus
+
+* Bhopal (initial launch)
+* Priority areas:
+
+  * Kolar Road
+  * Arera Colony
+  * MP Nagar
+  * Nearby residential clusters
+
+The system is designed to scale to other Tier-2 cities after validation.
+
+---
+
+## Core Features
+
+* Role-based access (Customer / Washer)
+* Subscription management
+* Booking & scheduling
+* Service tracking
+* Payment integration
+* Scalable backend architecture
+* Mobile-first UI
+
+---
+
+## Tech Stack
+
+* **Frontend**: React + TypeScript
+* **Build Tool**: Vite
+* **UI Components**: shadcn-ui
+* **Styling**: Tailwind CSS
+* **Architecture**: Component-driven, API-based
+
+---
+
+## Local Development Setup
+
+### Prerequisites
+
+* Node.js (v18 or later recommended)
+* npm
+
+### Steps
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available locally with hot reloading enabled.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## Project Vision
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+This project aims to:
 
-## What technologies are used for this project?
+* Formalize everyday local services using technology
+* Improve reliability and trust in daily utility services
+* Create sustainable income for service workers
+* Serve Tier-2 city needs instead of blindly copying metro-only products
 
-This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+But first, internalize this: a product without a clear problem statement is just a UI demo. This one now actually knows what it’s doing.
