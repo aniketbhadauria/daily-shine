@@ -1,14 +1,25 @@
 import { useState, useRef } from "react";
-import { Camera, Check, X, RotateCcw, Upload } from "lucide-react";
+import { Camera, Check, RotateCcw, MapPin, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface WashCompletionSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  onComplete: (photos: { before?: string; after?: string }) => void;
+  onComplete: (data: {
+    beforePhotoUrl?: string;
+    afterPhotoUrl?: string;
+    gpsLatitude?: number;
+    gpsLongitude?: number;
+    gpsVerified?: boolean;
+  }) => void;
   customerName: string;
   carInfo: string;
+  jobId?: string;
+  targetLatitude?: number;
+  targetLongitude?: number;
 }
 
 export const WashCompletionSheet = ({
@@ -17,12 +28,20 @@ export const WashCompletionSheet = ({
   onComplete,
   customerName,
   carInfo,
+  jobId,
+  targetLatitude,
+  targetLongitude,
 }: WashCompletionSheetProps) => {
   const [step, setStep] = useState<"before" | "after" | "confirm">("before");
   const [beforePhoto, setBeforePhoto] = useState<string | null>(null);
   const [afterPhoto, setAfterPhoto] = useState<string | null>(null);
+  const [beforePhotoFile, setBeforePhotoFile] = useState<File | null>(null);
+  const [afterPhotoFile, setAfterPhotoFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const currentPhotoType = useRef<"before" | "after">("before");
+
+  const { getCurrentPosition, verifyLocation, loading: gpsLoading, error: gpsError } = useGeolocation();
 
   if (!isOpen) return null;
 
@@ -34,9 +53,11 @@ export const WashCompletionSheet = ({
         const result = reader.result as string;
         if (currentPhotoType.current === "before") {
           setBeforePhoto(result);
+          setBeforePhotoFile(file);
           setStep("after");
         } else {
           setAfterPhoto(result);
+          setAfterPhotoFile(file);
           setStep("confirm");
         }
       };
@@ -50,12 +71,69 @@ export const WashCompletionSheet = ({
     fileInputRef.current?.click();
   };
 
-  const handleComplete = () => {
-    onComplete({
-      before: beforePhoto || undefined,
-      after: afterPhoto || undefined,
-    });
-    resetState();
+  const uploadPhoto = async (file: File, type: "before" | "after"): Promise<string | null> => {
+    const fileName = `${jobId || "demo"}_${type}_${Date.now()}.jpg`;
+    const { data, error } = await supabase.storage
+      .from("wash-photos")
+      .upload(fileName, file, { contentType: "image/jpeg" });
+
+    if (error) {
+      console.error("Upload error:", error);
+      return null;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("wash-photos")
+      .getPublicUrl(data.path);
+
+    return urlData.publicUrl;
+  };
+
+  const handleComplete = async () => {
+    setUploading(true);
+
+    try {
+      // Get GPS location
+      const position = await getCurrentPosition();
+      let gpsVerified = false;
+
+      if (position && targetLatitude && targetLongitude) {
+        gpsVerified = await verifyLocation(targetLatitude, targetLongitude, 100);
+      }
+
+      // Upload photos if we have real files
+      let beforePhotoUrl: string | undefined;
+      let afterPhotoUrl: string | undefined;
+
+      if (beforePhotoFile) {
+        beforePhotoUrl = (await uploadPhoto(beforePhotoFile, "before")) || undefined;
+      }
+
+      if (afterPhotoFile) {
+        afterPhotoUrl = (await uploadPhoto(afterPhotoFile, "after")) || undefined;
+      }
+
+      onComplete({
+        beforePhotoUrl,
+        afterPhotoUrl,
+        gpsLatitude: position?.latitude,
+        gpsLongitude: position?.longitude,
+        gpsVerified,
+      });
+
+      if (gpsVerified) {
+        toast.success("Location verified! Wash marked complete.");
+      } else if (position) {
+        toast.info("Wash completed. Location could not be verified.");
+      }
+
+      resetState();
+    } catch (error) {
+      console.error("Error completing wash:", error);
+      toast.error("Failed to complete wash");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSkipPhotos = () => {
@@ -67,6 +145,8 @@ export const WashCompletionSheet = ({
     setStep("before");
     setBeforePhoto(null);
     setAfterPhoto(null);
+    setBeforePhotoFile(null);
+    setAfterPhotoFile(null);
   };
 
   const handleClose = () => {
@@ -91,6 +171,14 @@ export const WashCompletionSheet = ({
             <p className="text-muted-foreground mt-1">
               {customerName} • {carInfo}
             </p>
+          </div>
+
+          {/* GPS Status */}
+          <div className="flex items-center justify-center gap-2 mb-4 p-2 rounded-lg bg-secondary">
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              {gpsLoading ? "Getting location..." : gpsError || "GPS will verify your location"}
+            </span>
           </div>
 
           {/* Hidden file input */}
@@ -179,6 +267,7 @@ export const WashCompletionSheet = ({
                     <button
                       onClick={() => {
                         setBeforePhoto(null);
+                        setBeforePhotoFile(null);
                         setStep("before");
                       }}
                       className="absolute top-2 right-2 h-6 w-6 rounded-full bg-foreground/80 flex items-center justify-center"
@@ -188,9 +277,7 @@ export const WashCompletionSheet = ({
                   </div>
                 ) : (
                   <div
-                    onClick={() => {
-                      setStep("before");
-                    }}
+                    onClick={() => setStep("before")}
                     className="aspect-square rounded-xl bg-secondary flex flex-col items-center justify-center cursor-pointer"
                   >
                     <Camera className="h-6 w-6 text-muted-foreground mb-1" />
@@ -211,6 +298,7 @@ export const WashCompletionSheet = ({
                     <button
                       onClick={() => {
                         setAfterPhoto(null);
+                        setAfterPhotoFile(null);
                         setStep("after");
                       }}
                       className="absolute top-2 right-2 h-6 w-6 rounded-full bg-foreground/80 flex items-center justify-center"
@@ -229,9 +317,18 @@ export const WashCompletionSheet = ({
                 )}
               </div>
 
-              <Button size="xl" className="w-full" onClick={handleComplete}>
-                <Check className="h-5 w-5 mr-2" />
-                Mark Completed
+              <Button
+                size="xl"
+                className="w-full"
+                onClick={handleComplete}
+                disabled={uploading || gpsLoading}
+              >
+                {uploading || gpsLoading ? (
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                ) : (
+                  <Check className="h-5 w-5 mr-2" />
+                )}
+                {uploading ? "Uploading..." : gpsLoading ? "Getting location..." : "Mark Completed"}
               </Button>
 
               <Button variant="ghost" className="w-full" onClick={handleClose}>

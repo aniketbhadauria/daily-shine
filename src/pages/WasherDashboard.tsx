@@ -75,7 +75,13 @@ const WasherDashboard = () => {
     setShowCompletionSheet(true);
   };
 
-  const handleComplete = (photos: { before?: string; after?: string }) => {
+  const handleComplete = (data: {
+    beforePhotoUrl?: string;
+    afterPhotoUrl?: string;
+    gpsLatitude?: number;
+    gpsLongitude?: number;
+    gpsVerified?: boolean;
+  }) => {
     if (!selectedJob) return;
 
     setJobs((prev) =>
@@ -88,6 +94,7 @@ const WasherDashboard = () => {
                 hour: "2-digit",
                 minute: "2-digit",
               }),
+              gpsVerified: data.gpsVerified,
             }
           : job
       )
