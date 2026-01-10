@@ -8,14 +8,17 @@ import { CalendarGrid } from "@/components/CalendarGrid";
 import { StatsCard } from "@/components/StatsCard";
 import { SubscriptionCard } from "@/components/SubscriptionCard";
 import { Button } from "@/components/ui/button";
-import { Droplets, TrendingUp, Calendar, Settings, ChevronRight, Plus, MapPin, Truck } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { Droplets, TrendingUp, Calendar, Settings, ChevronRight, Plus, MapPin, Truck, Shield, LogOut, LogIn, Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 // Photo proof images
 import washAfter1 from "@/assets/wash-after-1.jpg";
 import washBefore1 from "@/assets/wash-before-1.jpg";
 
 const Index = () => {
+  const { user, userRole, profile, loading, signOut } = useAuth();
+  const navigate = useNavigate();
   const [activeNav, setActiveNav] = useState("today");
   const [activeHomeTab, setActiveHomeTab] = useState("today");
   const [selectedPlan, setSelectedPlan] = useState("daily");
@@ -242,16 +245,52 @@ const Index = () => {
           <>
             <Header title="Account" showNotification={false} />
             <div className="space-y-6 animate-fade-in">
+              {/* User Profile */}
               <div className="flex items-center gap-4 p-4 rounded-xl bg-card card-elevated">
                 <div className="h-14 w-14 rounded-full bg-accent/10 flex items-center justify-center">
-                  <span className="text-xl font-bold text-accent">RA</span>
+                  <span className="text-xl font-bold text-accent">
+                    {user ? (profile?.full_name?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || "U") : "?"}
+                  </span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold">Rahul Agarwal</h3>
-                  <p className="text-sm text-muted-foreground">+91 98765 43210</p>
+                  <h3 className="font-semibold">{profile?.full_name || user?.email || "Guest"}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {user ? (userRole === "admin" ? "Admin" : userRole === "washer" ? "Washer" : "Customer") : "Not signed in"}
+                  </p>
                 </div>
-                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                {user ? (
+                  <Button variant="ghost" size="icon-sm" onClick={() => signOut()}>
+                    <LogOut className="h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Link to="/auth">
+                    <Button variant="ghost" size="icon-sm">
+                      <LogIn className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                )}
               </div>
+
+              {/* Auth Section */}
+              {!user && (
+                <Link to="/auth">
+                  <Button className="w-full" size="lg">
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Sign in to your account
+                  </Button>
+                </Link>
+              )}
+
+              {/* Admin Panel Link */}
+              {userRole === "admin" && (
+                <Link to="/admin">
+                  <button className="w-full flex items-center gap-3 p-4 rounded-xl bg-primary/10 border border-primary/30 hover:bg-primary/20 transition-colors">
+                    <Shield className="h-5 w-5 text-primary" />
+                    <span className="flex-1 text-left font-medium text-primary">Admin Panel</span>
+                    <ChevronRight className="h-5 w-5 text-primary" />
+                  </button>
+                </Link>
+              )}
 
               <section>
                 <h2 className="text-lg font-semibold mb-3">Change Plan</h2>
@@ -287,7 +326,7 @@ const Index = () => {
                 </div>
               </section>
 
-              {/* Demo: Switch to Washer App */}
+              {/* Demo Mode */}
               <section>
                 <h2 className="text-lg font-semibold mb-3">Demo Mode</h2>
                 <Link to="/washer">
@@ -297,9 +336,6 @@ const Index = () => {
                     <ChevronRight className="h-5 w-5 text-accent" />
                   </button>
                 </Link>
-                <p className="text-xs text-muted-foreground mt-2 text-center">
-                  Switch to the washer interface to see their daily route
-                </p>
               </section>
             </div>
           </>

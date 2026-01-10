@@ -15,6 +15,9 @@ interface WashJob {
   status: WashJobStatus;
   completedAt?: string;
   missedReason?: string;
+  gpsVerified?: boolean;
+  targetLatitude?: number;
+  targetLongitude?: number;
 }
 
 interface RouteCardProps {
